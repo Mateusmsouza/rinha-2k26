@@ -1,0 +1,74 @@
+name: PR Checker Quality Gate
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  stress-test:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Setup k6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Install jq
+        run: sudo apt-get install jq -y
+
+      - name: Build and Start Services
+        run: docker compose up -d --build
+
+      - name: Wait for Services (Healthcheck)
+        run: |
+          timeout 60s bash -c 'until curl -s localhost:9999 > /dev/null; do sleep 2; done'
+
+      - name: Run Stress Test
+        run: |
+          # A flag -s (silent) impede que o make imprima os comandos no stdout
+          make --silent run-stress-test > stress_results.json
+
+      - name: Parse Results
+        id: parse_results
+        run: |
+          # É importante usar aspas duplas "$RESULT" para preservar a estrutura do JSON
+          RESULT=$(cat stress_results.json)
+
+          P99=$(echo "$RESULT" | jq -r '.p99')
+          SCORE=$(echo "$RESULT" | jq -r '.scoring.final_score')
+          FAIL_RATE=$(echo "$RESULT" | jq -r '.scoring.failure_rate')
+          TOTAL_REQ=$(echo "$RESULT" | jq -r '.expected.total')
+
+          # Criando corpo do comentário em Markdown
+          echo "COMMENT_BODY<<EOF" >> $GITHUB_ENV
+          echo "### Resultado do Stress Test (Quality Gate)" >> $GITHUB_ENV
+          echo "| Métrica | Valor |" >> $GITHUB_ENV
+          echo "| --- | --- |" >> $GITHUB_ENV
+          echo "| **Final Score** | $SCORE |" >> $GITHUB_ENV
+          echo "| **p99** | $P99 |" >> $GITHUB_ENV
+          echo "| **Failure Rate** | $FAIL_RATE |" >> $GITHUB_ENV
+          echo "| **Total Requests** | $TOTAL_REQ |" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "#### Detalhamento Scoring:" >> $GITHUB_ENV
+          echo "\`\`\`json" >> $GITHUB_ENV
+          echo "$RESULT" | jq '.scoring.breakdown' >> $GITHUB_ENV
+          echo "\`\`\`" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Comment on PR
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ env.COMMENT_BODY }}
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down

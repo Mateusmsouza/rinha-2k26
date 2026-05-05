@@ -10,3 +10,40 @@ $ docker compose up
 $ make run-stress-test
 ```
 
+## última execução do stress test:
+```{
+  "expected": {
+    "total": 54100,
+    "fraud_count": 24058,
+    "legit_count": 30042,
+    "fraud_rate": 0.4447,
+    "legit_rate": 0.5553,
+    "edge_case_count": 797,
+    "edge_case_rate": 0.0147
+  },
+  "p99": "1.99ms",
+  "scoring": {
+    "breakdown": {
+      "false_positive_detections": 15066,
+      "false_negative_detections": 11871,
+      "true_positive_detections": 12166,
+      "true_negative_detections": 14956,
+      "http_errors": 0
+    },
+    "failure_rate": "49.83%",
+    "weighted_errors_E": 50679,
+    "error_rate_epsilon": 0.937476,
+    "p99_score": {
+      "value": 2701.55,
+      "cut_triggered": false
+    },
+    "detection_score": {
+      "value": -3000,
+      "rate_component": null,
+      "absolute_penalty": null,
+      "cut_triggered": true
+    },
+    "final_score": -298.45
+  }
+}```
+

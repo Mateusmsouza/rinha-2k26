@@ -4,6 +4,8 @@ from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
+from service_vector import vectorize_transaction
+
 
 async def ready(request):
     return JSONResponse({"status": "ready"}, status_code=200)
@@ -11,7 +13,8 @@ async def ready(request):
 
 async def fraud_score(request):
     try:
-        _ = await request.json()
+        data = await request.json()
+        transaction = vectorize_transaction(data=data)
         score = round(random.random(), 2)
         approved = score < 0.5
 

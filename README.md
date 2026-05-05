@@ -5,6 +5,12 @@
 - instale docker compose
 - bota a jiripoca pra pia
 
+### Ngix + UDS
+O `nginx` usa sockets unix compartilhados em `./sockets` para conversar com os apps.
+Cada app cria um socket diferente:
+- `app_0` -> `/run/app/app0.sock`
+- `app_1` -> `/run/app/app1.sock`
+
 ```sh
 $ docker compose up
 $ make run-stress-test

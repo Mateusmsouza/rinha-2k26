@@ -13,7 +13,7 @@ Cada app cria um socket diferente:
 
 ```sh
 $ docker compose up
-$ make run-stress-test
+$ make run-stress-test-unix
 ```
 
 ## última execução do stress test:

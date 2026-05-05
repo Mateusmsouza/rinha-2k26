@@ -1,24 +1,19 @@
 import numpy as np
 from datetime import datetime
 
-#TODO get config and mcc risk from files in resources
-CONFIG = {
-    "max_amount": 10000.0,
-    "max_installments": 12.0,
-    "amount_vs_avg_ratio": 10.0,
-    "max_minutes": 1440.0,
-    "max_km": 1000.0,
-    "max_tx_count_24h": 50.0,
-    "max_merchant_avg_amount": 1000.0,
-    "mcc_risk_default": 0.5
-}
+import json
+import os
 
-MCC_RISK_MAP = {
-    "5411": 0.2,
-    "5812": 0.4,
-    "7995": 0.9,
-    "7801": 0.7
-}
+BASE_PATH = "./resources"
+
+
+def _load_json_file(filepath: str) -> dict:
+    with open(filepath, "r") as f:
+        return json.load(f)
+
+CONFIG = _load_json_file(os.path.join(BASE_PATH, "normalization.json"))
+MCC_RISK_MAP = _load_json_file(os.path.join(BASE_PATH, "mcc_risk.json"))
+
 
 def clamp(x):
     return np.clip(x, 0.0, 1.0)
@@ -30,9 +25,7 @@ def vectorize_transaction(data: dict) -> np.ndarray:
     term = data.get("terminal", {})
     last_tx = data.get("last_transaction")
 
-    
     dt = datetime.strptime(tx["requested_at"], "%Y-%m-%dT%H:%M:%S%z")
-    
     v0 = clamp(tx["amount"] / CONFIG["max_amount"])
     v1 = clamp(tx["installments"] / CONFIG["max_installments"])
     v2 = clamp((tx["amount"] / cust["avg_amount"]) / CONFIG["amount_vs_avg_ratio"])

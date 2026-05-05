@@ -216,4 +216,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# UDS
+sockets/**/*
+!sockets/.gitkeep
+
+# Claudinho códigos
 .claude/settings.local.json

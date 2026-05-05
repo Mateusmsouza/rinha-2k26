@@ -1,4 +1,6 @@
+import os
 import random
+
 import uvicorn
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
@@ -30,5 +32,11 @@ routes = [
 app = Starlette(debug=True, routes=routes)
 
 
-def run_server(port: int):
-    uvicorn.run(app, host="0.0.0.0", port=port)
+def run_server(port: int | None = 5000, uds: str | None = None):
+    if uds:
+        os.makedirs(os.path.dirname(uds), exist_ok=True)
+        if os.path.exists(uds):
+            os.remove(uds)
+        uvicorn.run(app, uds=uds)
+    else:
+        uvicorn.run(app, host="0.0.0.0", port=port)

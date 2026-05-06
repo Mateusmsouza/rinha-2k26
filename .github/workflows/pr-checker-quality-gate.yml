@@ -34,7 +34,7 @@ jobs:
       - name: Run Stress Test
         run: |
           # A flag -s (silent) impede que o make imprima os comandos no stdout
-          make --silent run-stress-test > stress_results.json
+          make --silent run-stress-test-unix > stress_results.json
 
       - name: Parse Results
         id: parse_results

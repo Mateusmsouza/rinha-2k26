@@ -16,12 +16,12 @@ def build():
 
     file_path = "./resources/references.json.gz"
 
-    X = []
-    Y = []
+    X = np.empty((3000000, 14), dtype=np.float32)
+    Y = np.empty((3000000, 14), dtype=np.float32)
     with gzip.open(file_path, 'rt', encoding='utf-8') as f:
-        for obj in ijson.items(f, 'item'):
-            X.append(obj["vector"])
-            Y.append(obj["label"])
+        for i, obj in enumerate(ijson.items(f, 'item')):
+            X[i] = obj["vector"]
+            Y[i] = 1 if obj["label"] == 'legit' else 0
 
     return np.array(X, dtype=np.float32), Y
 

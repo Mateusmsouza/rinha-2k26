@@ -2,6 +2,9 @@ services:
   app_0:
     platform: linux/amd64
     build: .
+    command: ["python", "main.py", "--uds", "/run/app/app0.sock"]
+    volumes:
+      - ./sockets:/run/app
     deploy:
       resources:
         limits:
@@ -11,6 +14,9 @@ services:
   app_1:
     platform: linux/amd64
     build: .
+    command: ["python", "main.py", "--uds", "/run/app/app1.sock"]
+    volumes:
+      - ./sockets:/run/app
     deploy:
       resources:
         limits:
@@ -18,10 +24,10 @@ services:
           memory: 165MB
 
   lb:
-    platform: linux/amd64
-    image: nginx:alpine
+    image: haproxy:alpine
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./sockets:/run/app
     ports:
       - "9999:9999"
     deploy:

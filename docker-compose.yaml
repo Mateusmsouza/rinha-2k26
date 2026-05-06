@@ -5,6 +5,8 @@ services:
     command: ["python", "main.py", "--uds", "/run/app/app0.sock"]
     volumes:
       - ./sockets:/run/app
+    networks:
+      - compose-network
     deploy:
       resources:
         limits:
@@ -17,6 +19,8 @@ services:
     command: ["python", "main.py", "--uds", "/run/app/app1.sock"]
     volumes:
       - ./sockets:/run/app
+    networks:
+      - compose-network
     deploy:
       resources:
         limits:
@@ -30,6 +34,8 @@ services:
       - ./sockets:/run/app
     ports:
       - "9999:9999"
+    networks:
+      - compose-network
     deploy:
       resources:
         limits:
@@ -38,3 +44,7 @@ services:
     depends_on:
       - app_0
       - app_1
+
+networks:
+  compose-network:
+    driver: bridge

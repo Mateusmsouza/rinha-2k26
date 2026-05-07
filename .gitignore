@@ -223,3 +223,6 @@ sockets/**/*
 
 # Claudinho códigos
 .claude/settings.local.json
+
+# faiss index
+fraud_index.faiss

@@ -3,3 +3,5 @@ uvicorn[standard]==0.27.1
 python-multipart==0.0.9
 numpy==2.2.2
 ijson==3.5.0
+faiss-cpu==1.13.2
+packaging==26.2

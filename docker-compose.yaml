@@ -2,9 +2,9 @@ services:
   app_0:
     platform: linux/amd64
     build: .
-    command: ["python", "main.py", "--uds", "/run/app/app0.sock"]
+    command: ["--uds", "/run/app/app0.sock"]
     volumes:
-      - ./sockets:/run/app
+      - app-sockets:/run/app
     networks:
       - compose-network
     deploy:
@@ -12,13 +12,15 @@ services:
         limits:
           cpus: "0.25"
           memory: 165MB
+    environment:
+      - PYTHONPATH=/app
 
   app_1:
     platform: linux/amd64
     build: .
-    command: ["python", "main.py", "--uds", "/run/app/app1.sock"]
+    command: ["--uds", "/run/app/app1.sock"]
     volumes:
-      - ./sockets:/run/app
+      - app-sockets:/run/app
     networks:
       - compose-network
     deploy:
@@ -26,12 +28,14 @@ services:
         limits:
           cpus: "0.25"
           memory: 165MB
+    environment:
+      - PYTHONPATH=/app
 
   lb:
     image: haproxy:alpine
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-      - ./sockets:/run/app
+      - app-sockets:/run/app
     ports:
       - "9999:9999"
     networks:
@@ -48,3 +52,6 @@ services:
 networks:
   compose-network:
     driver: bridge
+
+volumes:
+  app-sockets:

@@ -1,10 +1,10 @@
-import numpy as np
-from datetime import datetime
-
 import json
 import os
+from datetime import datetime
 
-BASE_PATH = "./resources"
+import numpy as np
+
+BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources")
 
 
 def _load_json_file(filepath: str) -> dict:

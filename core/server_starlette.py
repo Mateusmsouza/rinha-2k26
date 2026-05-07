@@ -6,7 +6,7 @@ from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
-from service_vector import vectorize_transaction
+from .service_vector import vectorize_transaction
 
 
 async def ready(request):

@@ -1,6 +1,6 @@
 import numpy as np
 
-from service_vector import vectorize_transaction
+from .service_vector import vectorize_transaction
 
 # build phase
 
@@ -59,9 +59,10 @@ def search_ivf_vec(query, X, centroids, lists, nprobe=3, k=5):
 
 
 if __name__ == "__main__":
-    import json
     import gzip
-    file_path = "./resources/references.json.gz"
+    import json
+    import os
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources", "references.json.gz")
     with gzip.open(file_path, 'rt', encoding='UTF-8') as zip_file:
         data = json.load(zip_file)
         X = []

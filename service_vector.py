@@ -13,6 +13,7 @@ def _load_json_file(filepath: str) -> dict:
 
 CONFIG = _load_json_file(os.path.join(BASE_PATH, "normalization.json"))
 MCC_RISK_MAP = _load_json_file(os.path.join(BASE_PATH, "mcc_risk.json"))
+MCC_RISK_DEFAULT = .5
 
 
 def clamp(x):
@@ -49,7 +50,7 @@ def vectorize_transaction(data: dict) -> np.ndarray:
     v10 = 1.0 if term.get("card_present") else 0.0
     v11 = 0.0 if merch["id"] in cust.get("known_merchants", []) else 1.0
 
-    v12 = MCC_RISK_MAP.get(merch["mcc"], CONFIG["mcc_risk_default"])
+    v12 = MCC_RISK_MAP.get(merch["mcc"], MCC_RISK_DEFAULT)
     v13 = clamp(merch["avg_amount"] / CONFIG["max_merchant_avg_amount"])
 
     return np.array([v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13], dtype=np.float32)

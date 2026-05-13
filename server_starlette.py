@@ -2,9 +2,12 @@ import os
 import random
 
 import uvicorn
+import traceback
 from starlette.applications import Starlette
 from starlette.responses import JSONResponse
 from starlette.routing import Route
+
+from service_vector import vectorize_transaction
 
 
 async def ready(request):
@@ -13,8 +16,11 @@ async def ready(request):
 
 async def fraud_score(request):
     try:
-        # data = await request.json()
-        # transaction = vectorize_transaction(data=data)
+        print(f"the request: {request}", flush=True)
+        data = await request.json()
+        transaction = vectorize_transaction(data=data)
+
+        print(f"the vectorize_transaction: {transaction}", flush=True)
         score = round(random.random(), 2)
         approved = score < 0.5
 
@@ -22,7 +28,8 @@ async def fraud_score(request):
             "approved": approved,
             "fraud_score": score
         })
-    except Exception:
+    except Exception as e:
+        traceback.print_exc()
         return JSONResponse({"error": "Invalid payload"}, status_code=400)
 
 routes = [

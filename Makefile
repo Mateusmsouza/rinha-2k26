@@ -1,5 +1,5 @@
 up:
-	docker compose up --build
+	docker compose -f docker-compose.dev.yml watch
 
 run-stress-test-windows:
 	powershell -Command "$$env:K6_NO_USAGE_REPORT='true'; k6 run test/test.js"

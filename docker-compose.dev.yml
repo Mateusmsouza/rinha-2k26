@@ -1,0 +1,66 @@
+x-app-develop: &app_develop
+  watch:
+    - path: .
+      target: /app
+      action: sync+restart
+      include:
+        - "**/*.py"
+      ignore:
+        - "**/__pycache__/**"
+        - "**/.mypy_cache/**"
+      initial_sync: true
+
+services:
+  app_0:
+    platform: linux/amd64
+    build: .
+    command: ["python", "-u", "main.py", "--uds", "/run/app/app0.sock"]
+    volumes:
+      - ./sockets:/run/app
+    develop:
+      <<: *app_develop
+    networks:
+      - compose-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 165MB
+
+  app_1:
+    platform: linux/amd64
+    build: .
+    command: ["python", "-u", "main.py", "--uds", "/run/app/app1.sock"]
+    volumes:
+      - ./sockets:/run/app
+    develop:
+      <<: *app_develop
+    networks:
+      - compose-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 165MB
+
+  lb:
+    image: haproxy:alpine
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - ./sockets:/run/app
+    ports:
+      - "9999:9999"
+    networks:
+      - compose-network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 20MB
+    depends_on:
+      - app_0
+      - app_1
+
+networks:
+  compose-network:
+    driver: bridge

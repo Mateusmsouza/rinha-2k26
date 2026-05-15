@@ -1,9 +1,12 @@
 services:
   app_0:
+    platform: linux/amd64
     build: .
-    command: ["python", "main.py", "--uds", "/run/app/app0.sock"]
+    command: ["python", "-u", "main.py", "--uds", "/run/app/app0.sock"]
     volumes:
       - ./sockets:/run/app
+    networks:
+      - compose-network
     deploy:
       resources:
         limits:
@@ -11,10 +14,13 @@ services:
           memory: 165MB
 
   app_1:
+    platform: linux/amd64
     build: .
-    command: ["python", "main.py", "--uds", "/run/app/app1.sock"]
+    command: ["python", "-u", "main.py", "--uds", "/run/app/app1.sock"]
     volumes:
       - ./sockets:/run/app
+    networks:
+      - compose-network
     deploy:
       resources:
         limits:
@@ -28,6 +34,8 @@ services:
       - ./sockets:/run/app
     ports:
       - "9999:9999"
+    networks:
+      - compose-network
     deploy:
       resources:
         limits:
@@ -36,3 +44,7 @@ services:
     depends_on:
       - app_0
       - app_1
+
+networks:
+  compose-network:
+    driver: bridge
